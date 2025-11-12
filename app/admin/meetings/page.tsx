@@ -38,13 +38,13 @@ export default function AdminMeetingsPage() {
 
     if (!adminRecord) return
 
-    setClubId(adminRecord.club_id)
+    setClubId((adminRecord as any).club_id)
 
     // Get meetings
     const { data: meetingsData } = await supabase
       .from('meetings')
       .select('*, levels(*)')
-      .eq('club_id', adminRecord.club_id)
+      .eq('club_id', (adminRecord as any).club_id)
       .order('scheduled_at', { ascending: false })
 
     setMeetings(meetingsData || [])

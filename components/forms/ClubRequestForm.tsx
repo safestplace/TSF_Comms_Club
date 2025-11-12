@@ -67,7 +67,7 @@ export function ClubRequestForm({ onSuccess }: ClubRequestFormProps) {
 
     if (!user) return
 
-    const { error } = await supabase.from('club_requests').insert({
+    const { error } = await (supabase.from('club_requests') as any).insert({
       requested_by_user: user.id,
       club_name: data.club_name,
       state_id: data.state_id,

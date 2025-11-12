@@ -52,10 +52,10 @@ export default function SuperAdminApprovalsPage() {
       .single()
 
     if (existingInstitution) {
-      institutionId = existingInstitution.id
+      institutionId = (existingInstitution as any).id
     } else {
-      const { data: newInstitution, error: institutionError } = await supabase
-        .from('institutions')
+      const { data: newInstitution, error: institutionError } = await (supabase
+        .from('institutions') as any)
         .insert({
           district_id: request.district_id,
           name: request.institution_text,
@@ -69,12 +69,12 @@ export default function SuperAdminApprovalsPage() {
         return
       }
 
-      institutionId = newInstitution.id
+      institutionId = (newInstitution as any).id
     }
 
     // Create the club
-    const { data: newClub, error: clubError } = await supabase
-      .from('clubs')
+    const { data: newClub, error: clubError } = await (supabase
+      .from('clubs') as any)
       .insert({
         name: request.club_name,
         slug: slugify(request.club_name),
@@ -93,8 +93,8 @@ export default function SuperAdminApprovalsPage() {
     }
 
     // Make the requester a club admin
-    await supabase.from('club_admins').insert({
-      club_id: newClub.id,
+    await (supabase.from('club_admins') as any).insert({
+      club_id: (newClub as any).id,
       user_id: request.requested_by_user,
       active: true,
     })
@@ -107,9 +107,9 @@ export default function SuperAdminApprovalsPage() {
       { number: 4, title: 'Expert', description: 'Leadership and mentorship' },
     ]
 
-    await supabase.from('levels').insert(
+    await (supabase.from('levels') as any).insert(
       levels.map((level) => ({
-        club_id: newClub.id,
+        club_id: (newClub as any).id,
         number: level.number,
         title: level.title,
         description: level.description,
@@ -128,17 +128,17 @@ export default function SuperAdminApprovalsPage() {
       { name: 'Ah-Counter', description: 'Counts filler words' },
     ]
 
-    await supabase.from('roles').insert(
+    await (supabase.from('roles') as any).insert(
       roles.map((role) => ({
-        club_id: newClub.id,
+        club_id: (newClub as any).id,
         name: role.name,
         description: role.description,
       }))
     )
 
     // Update the club request
-    await supabase
-      .from('club_requests')
+    await (supabase
+      .from('club_requests') as any)
       .update({
         status: 'approved',
         decided_by: user.id,
@@ -147,7 +147,7 @@ export default function SuperAdminApprovalsPage() {
       .eq('id', request.id)
 
     // Send notification
-    await supabase.from('notifications').insert({
+    await (supabase.from('notifications') as any).insert({
       user_id: request.requested_by_user,
       type: 'club_approved',
       message: `Your club "${request.club_name}" has been approved!`,
@@ -163,8 +163,8 @@ export default function SuperAdminApprovalsPage() {
     } = await supabase.auth.getUser()
     if (!user) return
 
-    await supabase
-      .from('club_requests')
+    await (supabase
+      .from('club_requests') as any)
       .update({
         status: 'rejected',
         decided_by: user.id,
@@ -172,7 +172,7 @@ export default function SuperAdminApprovalsPage() {
       })
       .eq('id', requestId)
 
-    await supabase.from('notifications').insert({
+    await (supabase.from('notifications') as any).insert({
       user_id: userId,
       type: 'club_rejected',
       message: 'Your club request was not approved.',

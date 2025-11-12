@@ -53,7 +53,7 @@ export function RoleRequestForm({ meetingId, clubId, onSuccess }: RoleRequestFor
 
     if (!user) return
 
-    const { error: insertError } = await supabase.from('role_requests').insert({
+    const { error: insertError } = await (supabase.from('role_requests') as any).insert({
       meeting_id: meetingId,
       user_id: user.id,
       role_id: data.role_id,

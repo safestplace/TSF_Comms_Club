@@ -39,7 +39,7 @@ export default function SuperAdminLayout({
           .eq('id', user.id)
           .single()
 
-        if (data?.global_role !== 'super') {
+        if ((data as any)?.global_role !== 'super') {
           router.push('/member')
         } else {
           setIsSuperAdmin(true)

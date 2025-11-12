@@ -44,7 +44,7 @@ export default async function MemberDashboard() {
     )
   }
 
-  const clubId = membership.club_id
+  const clubId = (membership as any).club_id
 
   // Get achievements count
   const { count: achievementsCount } = await supabase
@@ -86,7 +86,7 @@ export default async function MemberDashboard() {
           Welcome back!
         </h1>
         <p className="text-gray-600">
-          {membership.clubs.name}
+          {(membership as any).clubs.name}
         </p>
       </div>
 
@@ -140,7 +140,7 @@ export default async function MemberDashboard() {
               <div>
                 <p className="text-sm text-gray-600">Notifications</p>
                 <p className="text-3xl font-bold text-error-600">
-                  {notifications?.filter((n) => !n.read_at).length || 0}
+                  {(notifications as any[])?.filter((n: any) => !n.read_at).length || 0}
                 </p>
               </div>
               <Bell className="h-10 w-10 text-error-300" />
@@ -188,7 +188,7 @@ export default async function MemberDashboard() {
         <CardContent>
           {upcomingMeetings && upcomingMeetings.length > 0 ? (
             <div className="space-y-4">
-              {upcomingMeetings.map((meeting) => (
+              {(upcomingMeetings as any[]).map((meeting: any) => (
                 <div
                   key={meeting.id}
                   className="flex items-center justify-between p-4 border rounded-lg"
@@ -219,7 +219,7 @@ export default async function MemberDashboard() {
         <CardContent>
           {notifications && notifications.length > 0 ? (
             <div className="space-y-3">
-              {notifications.map((notification) => (
+              {(notifications as any[]).map((notification: any) => (
                 <div
                   key={notification.id}
                   className={`p-3 rounded-lg ${

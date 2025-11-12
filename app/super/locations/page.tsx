@@ -62,8 +62,8 @@ export default function LocationsPage() {
   const addState = async () => {
     if (!newStateName.trim()) return
 
-    const { error } = await supabase
-      .from('states')
+    const { error } = await (supabase
+      .from('states') as any)
       .insert({ name: newStateName.trim() })
 
     if (!error) {
@@ -75,8 +75,8 @@ export default function LocationsPage() {
   const addDistrict = async () => {
     if (!newDistrictName.trim() || !selectedStateId) return
 
-    const { error } = await supabase
-      .from('districts')
+    const { error } = await (supabase
+      .from('districts') as any)
       .insert({
         state_id: selectedStateId,
         name: newDistrictName.trim(),
@@ -89,8 +89,8 @@ export default function LocationsPage() {
   }
 
   const approveInstitution = async (institutionId: number) => {
-    const { error } = await supabase
-      .from('institutions')
+    const { error } = await (supabase
+      .from('institutions') as any)
       .update({ status: 'approved' })
       .eq('id', institutionId)
 
@@ -98,8 +98,8 @@ export default function LocationsPage() {
   }
 
   const rejectInstitution = async (institutionId: number) => {
-    const { error } = await supabase
-      .from('institutions')
+    const { error } = await (supabase
+      .from('institutions') as any)
       .delete()
       .eq('id', institutionId)
 

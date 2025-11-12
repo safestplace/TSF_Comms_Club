@@ -35,7 +35,7 @@ export default async function CertificatesPage() {
 
       {certificates && certificates.length > 0 ? (
         <div className="grid gap-6">
-          {certificates.map((cert) => (
+          {(certificates as any[]).map((cert: any) => (
             <Card key={cert.id}>
               <CardContent className="pt-6">
                 <div className="flex items-start justify-between">

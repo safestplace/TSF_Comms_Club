@@ -45,7 +45,7 @@ export function RegisterForm() {
 
     if (authData.user) {
       // Create user profile
-      const { error: profileError } = await supabase.from('users').insert({
+      const { error: profileError } = await (supabase.from('users') as any).insert({
         id: authData.user.id,
         name: data.name,
         email: data.email,

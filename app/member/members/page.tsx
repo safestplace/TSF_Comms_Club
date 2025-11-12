@@ -32,24 +32,27 @@ export default async function MembersPage() {
       *,
       users(name, email)
     `)
-    .eq('club_id', membership.club_id)
+    .eq('club_id', (membership as any).club_id)
     .eq('status', 'approved')
     .order('joined_at', { ascending: true })
+
+  // Get meeting IDs for the club first
+  const { data: meetings } = await supabase
+    .from('meetings')
+    .select('id')
+    .eq('club_id', (membership as any).club_id)
+
+  const meetingIds = (meetings as any[])?.map((m: any) => m.id) || []
 
   // Get role requests for members to show badges
   const { data: roleRequests } = await supabase
     .from('role_requests')
     .select('user_id, roles(name)')
     .eq('status', 'approved')
-    .in('meeting_id', 
-      supabase
-        .from('meetings')
-        .select('id')
-        .eq('club_id', membership.club_id)
-    )
+    .in('meeting_id', meetingIds)
 
   // Count roles per member
-  const memberRoleCounts = roleRequests?.reduce((acc: any, rr) => {
+  const memberRoleCounts = (roleRequests as any[])?.reduce((acc: any, rr: any) => {
     acc[rr.user_id] = (acc[rr.user_id] || 0) + 1
     return acc
   }, {})
@@ -74,7 +77,7 @@ export default async function MembersPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {members?.map((member) => (
+              {(members as any[])?.map((member: any) => (
                 <TableRow key={member.id}>
                   <TableCell>
                     <div className="flex items-center space-x-2">

@@ -28,7 +28,7 @@ export default async function AdminDashboard() {
     redirect('/member')
   }
 
-  const clubId = adminRecord.club_id
+  const clubId = (adminRecord as any).club_id
 
   // Get club stats
   const { count: membersCount } = await supabase
@@ -84,7 +84,7 @@ export default async function AdminDashboard() {
     <div className="max-w-6xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
-        <p className="text-gray-600">{adminRecord.clubs.name}</p>
+        <p className="text-gray-600">{(adminRecord as any).clubs.name}</p>
       </div>
 
       {/* Stats Grid */}
@@ -186,7 +186,7 @@ export default async function AdminDashboard() {
         <CardContent>
           {recentMeetings && recentMeetings.length > 0 ? (
             <div className="space-y-3">
-              {recentMeetings.map((meeting) => (
+              {(recentMeetings as any[]).map((meeting: any) => (
                 <div
                   key={meeting.id}
                   className="flex items-center justify-between p-3 border rounded-lg"

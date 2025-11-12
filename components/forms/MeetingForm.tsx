@@ -49,8 +49,8 @@ export function MeetingForm({ clubId, onSuccess, initialData }: MeetingFormProps
 
     if (initialData) {
       // Update existing meeting
-      const { error } = await supabase
-        .from('meetings')
+      const { error } = await (supabase
+        .from('meetings') as any)
         .update({
           title: data.title,
           level_id: data.level_id,
@@ -63,7 +63,7 @@ export function MeetingForm({ clubId, onSuccess, initialData }: MeetingFormProps
       if (!error) onSuccess()
     } else {
       // Create new meeting
-      const { error } = await supabase.from('meetings').insert({
+      const { error } = await (supabase.from('meetings') as any).insert({
         club_id: clubId,
         title: data.title,
         level_id: data.level_id,

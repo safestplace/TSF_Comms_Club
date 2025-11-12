@@ -39,13 +39,13 @@ export default function AdminMembersPage() {
 
     if (!adminRecord) return
 
-    setClubId(adminRecord.club_id)
+    setClubId((adminRecord as any).club_id)
 
     // Get approved members
     const { data: approvedMembers, count: approvedCnt } = await supabase
       .from('club_members')
       .select('*, users(name, email)', { count: 'exact' })
-      .eq('club_id', adminRecord.club_id)
+      .eq('club_id', (adminRecord as any).club_id)
       .eq('status', 'approved')
       .order('joined_at', { ascending: true })
 
@@ -53,14 +53,14 @@ export default function AdminMembersPage() {
     setApprovedCount(approvedCnt || 0)
 
     // Count organizers
-    const organizerCnt = approvedMembers?.filter((m) => m.is_organizer).length || 0
+    const organizerCnt = (approvedMembers as any[])?.filter((m: any) => m.is_organizer).length || 0
     setOrganizerCount(organizerCnt)
 
     // Get pending members
     const { data: pendingMembersData } = await supabase
       .from('club_members')
       .select('*, users(name, email)')
-      .eq('club_id', adminRecord.club_id)
+      .eq('club_id', (adminRecord as any).club_id)
       .eq('status', 'pending')
       .order('joined_at', { ascending: true })
 
@@ -69,8 +69,8 @@ export default function AdminMembersPage() {
   }
 
   const approveMember = async (memberId: number) => {
-    const { error } = await supabase
-      .from('club_members')
+    const { error } = await (supabase
+      .from('club_members') as any)
       .update({ status: 'approved' })
       .eq('id', memberId)
 
@@ -78,7 +78,7 @@ export default function AdminMembersPage() {
       // Create notification
       const member = pendingMembers.find((m) => m.id === memberId)
       if (member) {
-        await supabase.from('notifications').insert({
+        await (supabase.from('notifications') as any).insert({
           user_id: member.user_id,
           type: 'member_approved',
           message: 'Your club membership has been approved!',
@@ -90,8 +90,8 @@ export default function AdminMembersPage() {
   }
 
   const rejectMember = async (memberId: number) => {
-    const { error } = await supabase
-      .from('club_members')
+    const { error } = await (supabase
+      .from('club_members') as any)
       .update({ status: 'rejected' })
       .eq('id', memberId)
 
@@ -106,8 +106,8 @@ export default function AdminMembersPage() {
       return
     }
 
-    const { error } = await supabase
-      .from('club_members')
+    const { error } = await (supabase
+      .from('club_members') as any)
       .update({ is_organizer: !currentStatus })
       .eq('id', memberId)
 

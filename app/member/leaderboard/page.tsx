@@ -28,12 +28,12 @@ export default async function LeaderboardPage() {
   const { data: leaderboard } = await supabase
     .from('v_leaderboard')
     .select('*, users(name, email)')
-    .eq('club_id', membership.club_id)
+    .eq('club_id', (membership as any).club_id)
     .order('approved_achievements_count', { ascending: false })
     .limit(50)
 
   const userRank =
-    leaderboard?.findIndex((entry) => entry.user_id === user.id) ?? -1
+    (leaderboard as any[])?.findIndex((entry: any) => entry.user_id === user.id) ?? -1
 
   return (
     <div className="max-w-4xl">
@@ -52,7 +52,7 @@ export default async function LeaderboardPage() {
               <div className="text-right">
                 <p className="text-sm text-gray-600">Achievements</p>
                 <p className="text-2xl font-bold">
-                  {leaderboard?.[userRank]?.approved_achievements_count || 0}
+                  {(leaderboard as any[])?.[userRank]?.approved_achievements_count || 0}
                 </p>
               </div>
             </div>
@@ -66,7 +66,7 @@ export default async function LeaderboardPage() {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {leaderboard?.map((entry, index) => (
+            {(leaderboard as any[])?.map((entry: any, index: number) => (
               <div
                 key={entry.user_id}
                 className={`flex items-center justify-between p-4 rounded-lg border ${

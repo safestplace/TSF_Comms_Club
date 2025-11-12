@@ -35,8 +35,8 @@ export default function NotificationsPage() {
   }
 
   const markAsRead = async (notificationId: number) => {
-    await supabase
-      .from('notifications')
+    await (supabase
+      .from('notifications') as any)
       .update({ read_at: new Date().toISOString() })
       .eq('id', notificationId)
 
@@ -49,8 +49,8 @@ export default function NotificationsPage() {
     } = await supabase.auth.getUser()
     if (!user) return
 
-    await supabase
-      .from('notifications')
+    await (supabase
+      .from('notifications') as any)
       .update({ read_at: new Date().toISOString() })
       .eq('user_id', user.id)
       .is('read_at', null)

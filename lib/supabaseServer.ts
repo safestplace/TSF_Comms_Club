@@ -35,7 +35,17 @@ export const createAdminClient = () => {
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     {
-      cookies: {},
+      cookies: {
+        get(name: string) {
+          return undefined
+        },
+        set(name: string, value: string, options: CookieOptions) {
+          // Admin client doesn't need cookie setting
+        },
+        remove(name: string, options: CookieOptions) {
+          // Admin client doesn't need cookie removal
+        },
+      },
     }
   )
 }

@@ -49,9 +49,9 @@ export function LoginForm() {
       .single()
 
     if (userData) {
-      if (userData.global_role === 'super') {
+      if ((userData as any).global_role === 'super') {
         router.push('/super/approvals')
-      } else if (userData.global_role === 'admin') {
+      } else if ((userData as any).global_role === 'admin') {
         router.push('/admin')
       } else {
         router.push('/member')

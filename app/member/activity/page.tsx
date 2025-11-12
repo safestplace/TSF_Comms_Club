@@ -37,13 +37,13 @@ export default function MemberActivityPage() {
       .single()
 
     if (membership) {
-      setClubId(membership.club_id)
+      setClubId((membership as any).club_id)
 
       // Get meetings
       const { data: meetingsData } = await supabase
         .from('meetings')
         .select('*, levels(*)')
-        .eq('club_id', membership.club_id)
+        .eq('club_id', (membership as any).club_id)
         .order('scheduled_at', { ascending: false })
 
       setMeetings(meetingsData || [])

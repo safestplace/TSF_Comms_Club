@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
     doc.fontSize(42)
        .fillColor('#667eea')
        .font('Helvetica-Bold')
-       .text(user.name, 0, 180, { align: 'center' })
+       .text((user as any).name, 0, 180, { align: 'center' })
 
     // Description
     doc.fontSize(18)
@@ -84,19 +84,19 @@ export async function POST(request: NextRequest) {
     doc.fontSize(32)
        .fillColor('#e74c3c')
        .font('Helvetica-Bold')
-       .text(`Level ${level.number}: ${level.title}`, 0, 280, { align: 'center' })
+       .text(`Level ${(level as any).number}: ${(level as any).title}`, 0, 280, { align: 'center' })
 
     // Level description
     doc.fontSize(18)
        .fillColor('#34495e')
        .font('Helvetica')
-       .text(level.description, 0, 330, { align: 'center', width: 400 })
+       .text((level as any).description, 0, 330, { align: 'center', width: 400 })
 
     // Club name
     doc.fontSize(24)
        .fillColor('#2c3e50')
        .font('Helvetica-Bold')
-       .text(club.name, 0, 380, { align: 'center' })
+       .text((club as any).name, 0, 380, { align: 'center' })
 
     // Date
     const dateStr = new Date().toLocaleDateString('en-US', {
@@ -141,7 +141,7 @@ export async function POST(request: NextRequest) {
     const hash = crypto.createHash('sha256').update(pdfBuffer).digest('hex')
 
     // Upload to Supabase Storage
-    const fileName = `certificates/${club.slug}/${user_id}/level-${level.number}.pdf`
+    const fileName = `certificates/${(club as any).slug}/${user_id}/level-${(level as any).number}.pdf`
 
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from('certificates')
@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
     const { data: authData } = await supabase.auth.getUser()
 
     // Save certificate record
-    const { error: certError } = await supabase.from('certificates').insert({
+    const { error: certError } = await (supabase.from('certificates') as any).insert({
       user_id,
       level_id,
       club_id,
