@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/lib/supabaseServer'
-import puppeteer from 'puppeteer'
 import crypto from 'crypto'
+import PDFDocument from 'pdfkit'
 
 export async function POST(request: NextRequest) {
   try {
@@ -39,180 +39,103 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Data not found' }, { status: 404 })
     }
 
-    // Generate certificate HTML
-    const certificateHTML = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <style>
-          * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-          }
-          body {
-            width: 297mm;
-            height: 210mm;
-            font-family: 'Georgia', serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          }
-          .certificate {
-            width: 280mm;
-            height: 190mm;
-            background: white;
-            padding: 40px;
-            border: 20px solid #f0e68c;
-            box-shadow: 0 0 40px rgba(0,0,0,0.2);
-            position: relative;
-          }
-          .header {
-            text-align: center;
-            margin-bottom: 30px;
-          }
-          .title {
-            font-size: 48px;
-            color: #2c3e50;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-          }
-          .subtitle {
-            font-size: 20px;
-            color: #7f8c8d;
-            margin-bottom: 40px;
-          }
-          .content {
-            text-align: center;
-            margin: 40px 0;
-          }
-          .recipient {
-            font-size: 42px;
-            color: #667eea;
-            margin: 20px 0;
-            font-weight: bold;
-          }
-          .description {
-            font-size: 18px;
-            color: #34495e;
-            line-height: 1.6;
-            max-width: 600px;
-            margin: 20px auto;
-          }
-          .level {
-            font-size: 32px;
-            color: #e74c3c;
-            margin: 20px 0;
-            font-weight: bold;
-          }
-          .footer {
-            margin-top: 50px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-          }
-          .signature {
-            text-align: center;
-          }
-          .signature-line {
-            width: 200px;
-            border-top: 2px solid #2c3e50;
-            margin-bottom: 10px;
-          }
-          .date {
-            text-align: center;
-            margin-top: 30px;
-            font-size: 16px;
-            color: #7f8c8d;
-          }
-          .club-name {
-            font-size: 24px;
-            color: #2c3e50;
-            font-weight: bold;
-          }
-          .seal {
-            position: absolute;
-            bottom: 40px;
-            right: 40px;
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            background: radial-gradient(circle, #f0e68c, #daa520);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: bold;
-            color: #2c3e50;
-            border: 3px solid #daa520;
-          }
-        </style>
-      </head>
-      <body>
-        <div class="certificate">
-          <div class="header">
-            <div class="title">Certificate of Achievement</div>
-            <div class="subtitle">This is to certify that</div>
-          </div>
-          
-          <div class="content">
-            <div class="recipient">${user.name}</div>
-            <div class="description">
-              has successfully completed
-            </div>
-            <div class="level">Level ${level.number}: ${level.title}</div>
-            <div class="description">
-              ${level.description}
-            </div>
-            <div class="club-name">${club.name}</div>
-          </div>
-          
-          <div class="date">
-            Issued on ${new Date().toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </div>
-          
-          <div class="footer">
-            <div class="signature">
-              <div class="signature-line"></div>
-              <div>Club Admin</div>
-            </div>
-            <div class="signature">
-              <div class="signature-line"></div>
-              <div>Platform Director</div>
-            </div>
-          </div>
-          
-          <div class="seal">
-            VERIFIED
-          </div>
-        </div>
-      </body>
-      </html>
-    `
-
-    // Generate PDF using Puppeteer
-    const browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    // Generate PDF using PDFKit
+    const doc = new PDFDocument({
+      size: 'A4',
+      layout: 'landscape',
     })
 
-    const page = await browser.newPage()
-    await page.setContent(certificateHTML, { waitUntil: 'networkidle0' })
-    await page.setViewport({ width: 1122, height: 793 }) // A4 landscape
+    const buffers: Buffer[] = []
+    doc.on('data', buffers.push.bind(buffers))
+    doc.on('end', () => {})
 
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      landscape: true,
-      printBackground: true,
+    // Background gradient (simplified)
+    doc.rect(0, 0, doc.page.width, doc.page.height).fill('#667eea')
+
+    // Certificate border
+    doc.rect(40, 40, doc.page.width - 80, doc.page.height - 80)
+       .fill('#ffffff')
+       .stroke('#f0e68c')
+       .lineWidth(10)
+
+    // Title
+    doc.fontSize(48)
+       .fillColor('#2c3e50')
+       .text('Certificate of Achievement', 0, 80, { align: 'center' })
+
+    // Subtitle
+    doc.fontSize(20)
+       .fillColor('#7f8c8d')
+       .text('This is to certify that', 0, 140, { align: 'center' })
+
+    // Recipient name
+    doc.fontSize(42)
+       .fillColor('#667eea')
+       .font('Helvetica-Bold')
+       .text(user.name, 0, 180, { align: 'center' })
+
+    // Description
+    doc.fontSize(18)
+       .fillColor('#34495e')
+       .font('Helvetica')
+       .text('has successfully completed', 0, 240, { align: 'center' })
+
+    // Level
+    doc.fontSize(32)
+       .fillColor('#e74c3c')
+       .font('Helvetica-Bold')
+       .text(`Level ${level.number}: ${level.title}`, 0, 280, { align: 'center' })
+
+    // Level description
+    doc.fontSize(18)
+       .fillColor('#34495e')
+       .font('Helvetica')
+       .text(level.description, 0, 330, { align: 'center', width: 400 })
+
+    // Club name
+    doc.fontSize(24)
+       .fillColor('#2c3e50')
+       .font('Helvetica-Bold')
+       .text(club.name, 0, 380, { align: 'center' })
+
+    // Date
+    const dateStr = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
     })
+    doc.fontSize(16)
+       .fillColor('#7f8c8d')
+       .font('Helvetica')
+       .text(`Issued on ${dateStr}`, 0, 450, { align: 'center' })
 
-    await browser.close()
+    // Signatures
+    doc.fontSize(14)
+       .fillColor('#2c3e50')
+       .font('Helvetica')
+
+    // Left signature
+    doc.text('Club Admin', 100, 500, { align: 'center', width: 200 })
+    doc.moveTo(50, 495).lineTo(250, 495).stroke()
+
+    // Right signature
+    doc.text('Platform Director', doc.page.width - 300, 500, { align: 'center', width: 200 })
+    doc.moveTo(doc.page.width - 250, 495).lineTo(doc.page.width - 50, 495).stroke()
+
+    // Seal
+    doc.circle(doc.page.width - 120, doc.page.height - 120, 50)
+       .fill('#f0e68c')
+       .stroke('#daa520')
+       .lineWidth(3)
+
+    doc.fontSize(12)
+       .fillColor('#2c3e50')
+       .font('Helvetica-Bold')
+       .text('VERIFIED', doc.page.width - 140, doc.page.height - 130, { align: 'center', width: 80 })
+
+    doc.end()
+
+    const pdfBuffer = Buffer.concat(buffers)
 
     // Generate SHA-256 hash
     const hash = crypto.createHash('sha256').update(pdfBuffer).digest('hex')

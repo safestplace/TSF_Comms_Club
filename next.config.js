@@ -1,8 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ['your-supabase-project.supabase.co'],
+    domains: ['xhuwyhirsxmaairbmset.supabase.co'],
   },
+  transpilePackages: ['puppeteer-core'],
 }
 
 module.exports = nextConfig

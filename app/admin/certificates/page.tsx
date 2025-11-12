@@ -37,7 +37,7 @@ export default function AdminCertificatesPage() {
 
     if (!adminRecord) return
 
-    setClubId(adminRecord.club_id)
+    setClubId((adminRecord as any).club_id)
 
     // Get approved achievements without certificates
     const { data: achievementsData } = await supabase
@@ -49,22 +49,22 @@ export default function AdminCertificatesPage() {
       `)
       .eq('status', 'approved')
 
-    const filteredAchievements = achievementsData?.filter(
-      (ar) => ar.levels.club_id === adminRecord.club_id
+    const filteredAchievements = (achievementsData as any[])?.filter(
+      (ar: any) => ar.levels.club_id === (adminRecord as any).club_id
     )
 
     // Check which achievements already have certificates
     const { data: existingCerts } = await supabase
       .from('certificates')
       .select('*')
-      .eq('club_id', adminRecord.club_id)
+      .eq('club_id', (adminRecord as any).club_id)
 
     const certsMap = new Map(
-      existingCerts?.map((c) => [`${c.user_id}-${c.level_id}`, c])
+      existingCerts?.map((c: any) => [`${c.user_id}-${c.level_id}`, c])
     )
 
     const achievementsWithoutCerts = filteredAchievements?.filter(
-      (ar) => !certsMap.has(`${ar.user_id}-${ar.level_id}`)
+      (ar: any) => !certsMap.has(`${ar.user_id}-${ar.level_id}`)
     )
 
     setApprovedAchievements(achievementsWithoutCerts || [])
@@ -77,7 +77,7 @@ export default function AdminCertificatesPage() {
         users(name, email),
         levels(number, title)
       `)
-      .eq('club_id', adminRecord.club_id)
+      .eq('club_id', (adminRecord as any).club_id)
       .order('issued_at', { ascending: false })
 
     setCertificates(certsData || [])
@@ -103,7 +103,7 @@ export default function AdminCertificatesPage() {
       })
 
       if (response.ok) {
-        await supabase.from('notifications').insert({
+        await (supabase.from('notifications') as any).insert({
           user_id: achievement.user_id,
           type: 'certificate_issued',
           message: `Your certificate for Level ${achievement.levels.number} has been issued!`,

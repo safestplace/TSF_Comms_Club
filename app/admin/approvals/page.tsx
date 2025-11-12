@@ -63,9 +63,9 @@ export default function AdminApprovalsPage() {
       .select('id')
       .eq('club_id', adminRecord.club_id)
 
-    const meetingIds = clubMeetings?.map((m) => m.id) || []
+    const meetingIds = (clubMeetings as any[])?.map((m: any) => m.id) || []
 
-    const filteredRoleRequests = roleRequestsData?.filter((rr) =>
+    const filteredRoleRequests = (roleRequestsData as any[])?.filter((rr: any) =>
       meetingIds.includes(rr.meeting_id)
     )
 
@@ -82,8 +82,8 @@ export default function AdminApprovalsPage() {
       `)
       .eq('status', 'pending')
 
-    const filteredAchievementRequests = achievementRequestsData?.filter(
-      (ar) => ar.levels.club_id === adminRecord.club_id
+    const filteredAchievementRequests = (achievementRequestsData as any[])?.filter(
+      (ar: any) => ar.levels.club_id === adminRecord.club_id
     )
 
     setAchievementRequests(filteredAchievementRequests || [])
@@ -96,8 +96,8 @@ export default function AdminApprovalsPage() {
     } = await supabase.auth.getUser()
     if (!user) return
 
-    const { error } = await supabase
-      .from('role_requests')
+    const { error } = await (supabase
+      .from('role_requests') as any)
       .update({
         status: 'approved',
         decided_by: user.id,
@@ -107,7 +107,7 @@ export default function AdminApprovalsPage() {
 
     if (!error) {
       // Create notification
-      await supabase.from('notifications').insert({
+      await (supabase.from('notifications') as any).insert({
         user_id: userId,
         type: 'role_approved',
         message: 'Your role request has been approved!',
@@ -123,8 +123,8 @@ export default function AdminApprovalsPage() {
     } = await supabase.auth.getUser()
     if (!user) return
 
-    const { error } = await supabase
-      .from('role_requests')
+    const { error } = await (supabase
+      .from('role_requests') as any)
       .update({
         status: 'rejected',
         decided_by: user.id,
@@ -133,7 +133,7 @@ export default function AdminApprovalsPage() {
       .eq('id', requestId)
 
     if (!error) {
-      await supabase.from('notifications').insert({
+      await (supabase.from('notifications') as any).insert({
         user_id: userId,
         type: 'role_rejected',
         message: 'Your role request was not approved.',
@@ -149,8 +149,8 @@ export default function AdminApprovalsPage() {
     } = await supabase.auth.getUser()
     if (!user) return
 
-    const { error } = await supabase
-      .from('achievement_requests')
+    const { error } = await (supabase
+      .from('achievement_requests') as any)
       .update({
         status: 'approved',
         decided_by: user.id,
@@ -159,7 +159,7 @@ export default function AdminApprovalsPage() {
       .eq('id', requestId)
 
     if (!error) {
-      await supabase.from('notifications').insert({
+      await (supabase.from('notifications') as any).insert({
         user_id: userId,
         type: 'achievement_approved',
         message: 'Your achievement has been approved! Certificate will be generated.',
@@ -175,8 +175,8 @@ export default function AdminApprovalsPage() {
     } = await supabase.auth.getUser()
     if (!user) return
 
-    const { error } = await supabase
-      .from('achievement_requests')
+    const { error } = await (supabase
+      .from('achievement_requests') as any)
       .update({
         status: 'rejected',
         decided_by: user.id,
@@ -185,7 +185,7 @@ export default function AdminApprovalsPage() {
       .eq('id', requestId)
 
     if (!error) {
-      await supabase.from('notifications').insert({
+      await (supabase.from('notifications') as any).insert({
         user_id: userId,
         type: 'achievement_rejected',
         message: 'Your achievement request was not approved.',
